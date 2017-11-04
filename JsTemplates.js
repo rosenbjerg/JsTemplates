@@ -58,8 +58,8 @@
     };
 
     jst.get = function get_template_from_url(url, callback) {
+        let xmlHttp = new XMLHttpRequest();
         if (callback){
-            let xmlHttp = new XMLHttpRequest();
             xmlHttp.onreadystatechange = function() {
                 if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
                     callback(new JsTemplate(xmlHttp.responseText));
@@ -68,10 +68,8 @@
             xmlHttp.send(null);
         }
         else {
-            let xmlHttp = new XMLHttpRequest();
             xmlHttp.open("GET", url, false);
-            xmlHttp.send( null );
-            console.log(xmlHttp.responseText);
+            xmlHttp.send(null);
             return new JsTemplate(xmlHttp.responseText);
         }
     };
