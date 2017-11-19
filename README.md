@@ -19,9 +19,9 @@ White-space is ignored, so `{{  variable  =Default value.. }}` will also be acce
 * `JsT.loadFromId(id [,removeAfterLoad])` creates a template from the innerHTML of the element with the given id. 
 Removes the HTMLElement from its parent if `true` is passed as second parameter
 
-* `JsT.get(url [,callback])` creates a templates from the html fetched using a get request to the given url.
-Passing a callback function as second parameter will make the request async, and the loaded template will be
-passed as first parameter to the callback function
+* `JsT.get(url, callback)` loads the content of the given url and parses it as html.
+All template elements, that has an id, are then selected and a JsTemplate are created from each. 
+The collection of JsTemplates are then returned as an object with a property based on the id of each of the template elements. (See example)
 
 * `JsT.create(html)` creates a template from the html passed as parameter
 
@@ -36,16 +36,29 @@ The `variables` parameter can be a string with the name of the variable it targe
 
 
 #### Example with template element with id:
-Html:
+index.html:
 ```
-<template id="testTemplate">
-    <h4>Welcome {{user.name}}</h4>
-    <input type="email" value="{{user.email}}">
-    <p>You have {{user.messages.length = no}}</p>
-    <p>Newest message: {{ user.messages[0] }}</p>
-</template>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>JsTemplates test</title>
+    <script src="JsTemplates.js"></script>
+</head>
+<body>
+    <template id="testTemplate">
+        <h3>{{title}}</h3>
+        <h5>Welcome {{user.name}}</h5>
+        <input type="email" value="{{user.email}}">
+        <p>You have {{user.messages.length = no}}</p>
+        <p>Newest message: {{ user.messages[0] }}</p>
+    </template>
+   
+    <script src="main.js"></script>
+</body>
+</html>
 ```
-JavaScript:
+main.js:
 ```
 let template = JsT.loadById("testTemplate");
 template.setFormatter("user.messages.length", function (val) {
@@ -57,5 +70,31 @@ document.body.innerHTML += template.render({
         email: "john@localhost",
         messages: ["Hi", "Welcome", "Goddag"]
     }
+});
+```
+
+
+#### Example with file containing templates
+templates.html:
+```
+<template id="templ1">
+    <h4>Template 1</h4>
+    <div>
+        Hello
+    </div>
+</template>
+
+<template id="templ2">
+    <h3>Template 2</h3>
+    <div>
+        Welcome
+    </div>
+</template>
+```
+main.js:
+```
+JsT.get("templates.html", function (templates) {
+    document.body.innerHTML += templates.templ1.render();
+    document.body.innerHTML += templates.templ2.render();
 });
 ```

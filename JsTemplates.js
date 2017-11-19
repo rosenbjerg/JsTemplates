@@ -37,36 +37,33 @@
     }
 
     function JsTemplate(html) {
-        let _maps = createMap(html);
-        let _formatters = {};
-
-        this.render = function render (parameterObj) {
-            if (!parameterObj)
-                parameterObj = {};
-            return _maps.index.reduce(function (output, props, i) {
-                let defSel = props.join('.');
-                let value = getValue(parameterObj, props);
-                if (!value)
-                    value = _maps.defaults[defSel];
-                if (_formatters[defSel] !== undefined)
-                    value = _formatters[defSel](value);
-                return output + value + _maps.html[i+1];
-            }, _maps.html[0]);
-        };
-
-        this.getDefaults = function get_variables_and_default_values() {
-            return Object.assign({}, _maps.defaults);
-        };
-
-        this.setFormatter = function (variables, formatter) {
-            if (typeof variables === 'string')
-                variables = [variables];
-            for (let i = 0; i < variables.length; i++) {
-                _formatters[variables[i]] = formatter;
-            }
-        };
+        this._maps = createMap(html);
+        this._formatters = {};
     }
 
+    JsTemplate.prototype.render = function render_template(parameterObj) {
+        if (!parameterObj)
+            parameterObj = {};
+        return this._maps.index.reduce((output, props, i) => {
+            let defSel = props.join('.');
+            let value = getValue(parameterObj, props);
+            if (!value)
+                value = this._maps.defaults[defSel];
+            if (this._formatters[defSel] !== undefined)
+                value = this._formatters[defSel](value);
+            return output + value + this._maps.html[i+1];
+        }, this._maps.html[0]);
+    };
+    JsTemplate.prototype.getDefaults = function get_variables_and_default_values() {
+        return Object.assign({}, this._maps.defaults);
+    };
+    JsTemplate.prototype.setFormatter = function set_formatter(variables, formatter) {
+        if (typeof variables === 'string')
+            variables = [variables];
+        for (let i = 0; i < variables.length; i++) {
+            this._formatters[variables[i]] = formatter;
+        }
+    };
 
     jst.load = function load_from_DOM_element (domElement) {
         if (!domElement)
@@ -75,7 +72,6 @@
             throw new Error("Argument is not a DOM element (no innerHTML property)");
         return new JsTemplate(domElement.innerHTML);
     };
-
     jst.loadById = function load_from_DOM_element_by_id (id, removeAfterLoad) {
         if (!id)
             throw new Error("Id cannot be null");
@@ -87,24 +83,25 @@
             template.parentNode.removeChild(template);
         return new JsTemplate(html);
     };
-
     jst.get = function get_template_from_url(url, callback) {
         let xmlHttp = new XMLHttpRequest();
-        if (callback){
-            xmlHttp.onreadystatechange = function() {
-                if (xmlHttp.readyState === 4 && xmlHttp.status === 200)
-                    callback(new JsTemplate(xmlHttp.responseText));
-            };
-            xmlHttp.open("GET", url, true);
-            xmlHttp.send(null);
-        }
-        else {
-            xmlHttp.open("GET", url, false);
-            xmlHttp.send(null);
-            return new JsTemplate(xmlHttp.responseText);
-        }
+        xmlHttp.onreadystatechange = () => {
+            if (xmlHttp.readyState === 4 && xmlHttp.status === 200){
+                let element = document.createElement("div");
+                element.innerHTML = xmlHttp.responseText;
+                let templates = element.getElementsByTagName("template");
+                let templCollection = {};
+                for (let i in templates) {
+                    if (!templates.hasOwnProperty(i) || !templates[i].id)
+                        continue;
+                    templCollection[templates[i].id] = new JsTemplate(templates[i].innerHTML);
+                }
+                callback(templCollection);
+            }
+        };
+        xmlHttp.open("GET", url, true);
+        xmlHttp.send(null);
     };
-
     jst.create = function create_from_html (html) {
         return new JsTemplate(html);
     };

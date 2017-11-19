@@ -10,3 +10,8 @@ document.body.innerHTML += template.render({
         messages: ["Hi", "Welcome", "Goddag"]
     }
 });
+
+JsT.get("templates.html", function (templates) {
+    document.body.innerHTML += templates.templ1.render();
+    document.body.innerHTML += templates.templ2.render();
+});
