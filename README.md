@@ -34,6 +34,10 @@ All of these functions return a JsTemplate object which has two functions:
 * `setFormatter(targetVariables, formatter)` sets the formatter function for one or more variable names. 
 The `variables` parameter can be a string with the name of the variable it targets, or an array of strings
 
+##### HTML Encoding
+Everything is html encoded by default, if this is unwanted use triple curly braces. 
+Only the lefthand curly braces needs to be triple: `{{{ name }}`, 
+but you can put three at both sides since it looks better: `{{{ name }}}`.
 
 #### Example with template element with id:
 index.html:

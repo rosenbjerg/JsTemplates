@@ -1,32 +1,46 @@
 "use strict";
 (function (window) {
-    const variableRegex = /{{ *(.+?)( *= *(.+?))? *}}/g;
-    const regex = /[\][.]?(\w+)[\].]?/g;
+    const variableRegex = /{{ *(.+?)( *= *(.+?))? *}}}?/g;
+    const selectorRegex = /[\][.]?(\w+)[\].]?/g;
+    const htmlEncoderRegex = /[^a-z0-9A-Z ]/g;
     let jst = {};
 
     function createMap(html) {
         let maps = {
             defaults: {},
             index: [],
+            encode: [],
             html: []
         };
         let index = 0;
         let match;
         while((match = variableRegex.exec(html)) !== null) {
+            let variableName = match[1];
+            let htmlEncode = true;
+            if (variableName.charAt(0) === '{') {
+                variableName = variableName.substr(1);
+                htmlEncode = false;
+            }
             let selectors = [];
             let sMatch;
-            while ((sMatch = regex.exec(match[1])) !== null) {
+
+            while ((sMatch = selectorRegex.exec(variableName)) !== null) {
                 selectors.push(sMatch[1])
             }
-            maps.defaults[match[1]] = !match[2] ? "" : match[3];
+            maps.defaults[variableName] = !match[2] ? "" : match[3];
             maps.index.push(selectors);
+            maps.encode.push(htmlEncode);
             maps.html.push(html.substring(index, match.index));
             index = match.index + match[0].length;
         }
         maps.html.push(html.substring(index, html.index));
         return maps;
     }
-
+    function encodeHtml(str) {
+        if(!str) return "";
+        let html = str.replace(htmlEncoderRegex, c => "&#" + c.charCodeAt(0) + ";");
+        return html;
+    }
     function getValue(obj, props) {
         for (let i in props) {
             if (obj[props[i]] === undefined)
@@ -40,7 +54,7 @@
         this._maps = createMap(html);
         this._formatters = {};
     }
-
+    
     JsTemplate.prototype.render = function render_template(parameterObj) {
         if (!parameterObj)
             parameterObj = {};
@@ -51,6 +65,8 @@
                 value = this._maps.defaults[defSel];
             if (this._formatters[defSel] !== undefined)
                 value = this._formatters[defSel](value);
+            if (this._maps.encode[i])
+                value = encodeHtml(value);
             return output + value + this._maps.html[i+1];
         }, this._maps.html[0]);
     };
@@ -105,7 +121,6 @@
     jst.create = function create_from_html (html) {
         return new JsTemplate(html);
     };
-
 
     if (typeof define === 'function' && define.amd) {
         define(function () {
