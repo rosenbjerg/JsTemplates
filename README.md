@@ -16,7 +16,8 @@ White-space is ignored, so `{{  variable  =Default value.. }}` will also be acce
 ### Functions
 * `JsT.load(domElement)` creates a templates from the innerHTML of the passed DOM element
 
-* `JsT.loadFromId(id)` creates a template from the innerHTML of the element with the given id
+* `JsT.loadFromId(id [,removeAfterLoad])` creates a template from the innerHTML of the element with the given id. 
+Removes the HTMLElement from its parent if `true` is passed as second parameter
 
 * `JsT.get(url [,callback])` creates a templates from the html fetched using a get request to the given url.
 Passing a callback function as second parameter will make the request async, and the loaded template will be
@@ -38,17 +39,23 @@ The `variables` parameter can be a string with the name of the variable it targe
 Html:
 ```
 <template id="testTemplate">
-    <h4>Welcome {{username}}</h4>
-    <input type="email" value="{{email}}">
-    <p>You have: {{messages = no new messages}}</p>
+    <h4>Welcome {{user.name}}</h4>
+    <input type="email" value="{{user.email}}">
+    <p>You have {{user.messages.length = no}}</p>
+    <p>Newest message: {{ user.messages[0] }}</p>
 </template>
 ```
 JavaScript:
 ```
 let template = JsT.loadById("testTemplate");
+template.setFormatter("user.messages.length", function (val) {
+    return val + " new messages";
+});
 document.body.innerHTML += template.render({
-    username: "JohnDoe",
-    email: "john@localhost",
-    messages: "2 new messages"
+    user: {
+        name: "JohnDoe",
+        email: "john@localhost",
+        messages: ["Hi", "Welcome", "Goddag"]
+    }
 });
 ```

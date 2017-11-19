@@ -1,9 +1,12 @@
-let template = JsT.loadById("testTemplate");
-template.setFormatter("messages", function (val) {
+let template = JsT.loadById("testTemplate", true);
+template.setFormatter("user.messages.length", function (val) {
     return val + " new messages";
 });
 document.body.innerHTML += template.render({
-    username: "JohnDoe",
-    email: "john@localhost",
-    messages: 2
+    title: "Mail view",
+    user: {
+        name: "JohnDoe",
+        email: "john@localhost",
+        messages: ["Hi", "Welcome", "Goddag"]
+    }
 });

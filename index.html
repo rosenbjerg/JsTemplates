@@ -6,17 +6,13 @@
     <script src="JsTemplates.js"></script>
 </head>
 <body>
-<div id="containerConrad">
-
-</div>
-<div>
-
-    <template id="testTemplate">
-        <h4>Welcome {{username}}</h4>
-        <input type="email" value="{{email}}">
-        <p>You have: {{messages = no new messages}}</p>
-    </template>
-</div>
-    <script src="main.js"></script>
+<template id="testTemplate">
+    <h3>{{title}}</h3>
+    <h5>Welcome {{user.name}}</h5>
+    <input type="email" value="{{user.email}}">
+    <p>You have {{user.messages.length = no}}</p>
+    <p>Newest message: {{ user.messages[0] }}</p>
+</template>
+<script src="main.js"></script>
 </body>
 </html>
