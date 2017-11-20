@@ -38,8 +38,7 @@
     }
     function encodeHtml(str) {
         if(!str) return "";
-        let html = str.replace(htmlEncoderRegex, c => "&#" + c.charCodeAt(0) + ";");
-        return html;
+        return str.toString().replace(htmlEncoderRegex, c => "&#" + c.charCodeAt(0) + ";");
     }
     function getValue(obj, props) {
         for (let i in props) {
@@ -54,7 +53,7 @@
         this._maps = createMap(html);
         this._formatters = {};
     }
-    
+
     JsTemplate.prototype.render = function render_template(parameterObj) {
         if (!parameterObj)
             parameterObj = {};
