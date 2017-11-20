@@ -18,7 +18,7 @@
             let variableName = match[1];
             let htmlEncode = true;
             if (variableName.charAt(0) === '{') {
-                variableName = variableName.substr(1);
+                variableName = variableName.substr(1).trim();
                 htmlEncode = false;
             }
             let selectors = [];
