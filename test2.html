@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <script src="JsTemplates.js"></script>
+    <title>Title</title>
+</head>
+<body>
+<template id="teste">
+    <label>Tags</label>
+    <table class="u-full-width">
+        <tbody id="added-tags" class="empty-placeholder u-full-width" data-empty-message="No tags added to ToI">
+        {{ Tags }}
+        </tbody>
+    </table>
+</template>
+<template id="save-edit-toi-template">
+    <h3 class="u-full-width">{{action}} TOI</h3>
+    <form id="save-edit-toi-form" data-id="{{Id}}">
+        <div class="row">
+            <div class="six columns">
+                <label>Title</label>
+                <input required="required" type="text" value="{{Title}}" name="title" class="u-full-width" id="createTitleInput">
+                <label>Image</label>
+                <input required="required" type="url" name="image" class="u-full-width" value="{{Image = https://}}">
+            </div>
+            <div class="six columns">
+                <label>Information</label>
+                <select name="type" class="u-full-width" name="type" id="createTypeInput">
+                    <option value="iframe">Website</option>
+                    <option value="video">Video</option>
+                    <option value="image">Image</option>
+                    <option value="audio">Audio</option>
+                    <option value="text">Text</option>
+                </select>
+                <input class="u-full-width" value="{{Url = https://}}" name="url" type="url">
+            </div>
+        </div>
+        <div class="row">
+            <div class="six columns">
+                <label>Tags</label>
+                <table class="u-full-width">
+                    <tbody id="added-tags" class="empty-placeholder u-full-width" data-empty-message="No tags added to ToI">{{{Tags}}</tbody>
+                </table>
+                <div id="add-toi-tag-search">
+                    <label>Find tags</label>
+                    <span class="ten columns">
+                            <input class="u-full-width" type="search">
+                        </span>
+                    <div class="two columns">
+                        <button class="material-icons u-full-width" type="button">search</button>
+                    </div>
+                    <table class="u-full-width">
+                        <tbody  id="tag-search-result" class="empty-placeholder" data-empty-message="Find tags to add using the search bar right above"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="six columns">
+                <label>Short description</label>
+                <textarea class="u-full-width" name="description" rows="10">{{Description}}</textarea>
+            </div>
+            <div class="six columns">
+                <label>Contexts</label>
+                <table class="u-full-width">
+                    <tbody id="added-contexts" class="empty-placeholder u-full-width" data-empty-message="No contexts added to ToI"></tbody>
+                </table>
+                <div id="add-toi-context-search">
+                    <label>Add contexts</label>
+                    <span class="ten columns">
+                            <input style="margin-bottom: 2px;" class="u-full-width" type="search">
+                        </span>
+                    <div class="two columns">
+                        <button style="margin-bottom: 2px;" class="material-icons u-full-width" type="button">search</button>
+                    </div>
+                    <a class="u-full-width" id="create-new-context-inline">Create new context</a>
+                    <table class="u-full-width">
+                        <tbody  id="context-search-result" class="empty-placeholder" data-empty-message="Find contexts to add using the search bar right above"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <input class="six columns button-primary" type="submit" value="Save TOI"/>
+    </form>
+</template>
+<script>
+    let sd = document.getElementById("teste");
+    console.log(sd.content);
+    for (let d in sd)
+    {
+        console.log(d);
+        console.log(sd[d]);
+    }
+    console.log(sd.nodeValue);
+    console.log(sd.textContent);
+    console.log(sd.innerHTML);
+    let template = JsT.loadById("teste");
+    document.body.innerHTML += template.render({
+        Tags: "<tr>" +
+        "<td>T1</td>" +
+        "<td>T2</td>" +
+        "<td>T3</td>" +
+        "</tr>"
+    });
+</script>
+</body>
+<script></script>
+</html>

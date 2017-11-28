@@ -3,8 +3,6 @@
 Simple templating engine in pure JavaScript
 
 Loading the library creates a global variable named JsT, unless used with module loaders like RequireJs.
-Templates can then be created using one of the four functions on the JsT object:
-
 
 ### Syntax
 Variables are wrapped in double curly braces: `{{variable}}`
@@ -17,6 +15,15 @@ Everything is html encoded by default, if this is unwanted use triple curly brac
 Only the lefthand curly braces needs to be triple: `{{{ name }}`, 
 but you can put three at both sides since it looks better: `{{{ name }}}`.
 
+
+### Tags
+Two types of tags are supported: `<template>` and `<script type='text/template'>` .
+
+If your template contains invalid HTML before being rendered, 
+using the `script`-type tag will guarantee that the browser does not parse and reformat the 
+HTML in any way. The `template` tags are parsed by the browser but not rendered.
+
+Templates can then be created using one of the four functions on the JsT object:
 
 ### Functions
 * `JsT.load(domElement)` creates a templates from the innerHTML of the passed DOM element
@@ -33,8 +40,6 @@ The collection of JsTemplates are then returned as an object with a property bas
 All of these functions return a JsTemplate object which has two functions:
 
 * `render(renderParameterObj)` renders the template using the passed parameter object
-
-* `getDefaults()` returns the variables and their default values found in the template. Only really useful for debugging
 
 * `setFormatter(targetVariables, formatter)` sets the formatter function for one or more variable names. 
 The `variables` parameter can be a string with the name of the variable it targets, or an array of strings
@@ -88,12 +93,12 @@ templates.html:
     </div>
 </template>
 
-<template id="templ2">
+<script type="text/template" id="templ2">
     <h3>Template 2</h3>
     <div>
         Welcome
     </div>
-</template>
+</script>
 ```
 main.js:
 ```

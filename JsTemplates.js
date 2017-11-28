@@ -1,5 +1,7 @@
 "use strict";
 (function (window) {
+    const Template = "template";
+    const ScriptTemplate = "script[type='text/template']";
     const variableRegex = /{{ *(.+?)( *= *(.+?))? *}}}?/g;
     const selectorRegex = /[\][.]?(\w+)[\].]?/g;
     const htmlEncoderRegex = /[^a-z0-9A-Z ]/g;
@@ -37,7 +39,8 @@
         return maps;
     }
     function encodeHtml(str) {
-        if(!str) return "";
+        if(!str)
+            return "";
         return str.toString().replace(htmlEncoderRegex, c => "&#" + c.charCodeAt(0) + ";");
     }
     function getValue(obj, props) {
@@ -48,7 +51,15 @@
         }
         return obj;
     }
-
+    function getInnerHtmlContent(domElement) {
+        if (domElement.matches(Template)) {
+            return domElement.innerHTML;
+        }
+        else if (domElement.matches(ScriptTemplate)){
+            return domElement.textContent;
+        }
+        throw new Error("DOM element must be a <template> or a <script type='text/template']>");
+    }
     function JsTemplate(html) {
         this._maps = createMap(html);
         this._formatters = {};
@@ -69,9 +80,6 @@
             return output + value + this._maps.html[i+1];
         }, this._maps.html[0]);
     };
-    JsTemplate.prototype.getDefaults = function get_variables_and_default_values() {
-        return Object.assign({}, this._maps.defaults);
-    };
     JsTemplate.prototype.setFormatter = function set_formatter(variables, formatter) {
         if (typeof variables === 'string')
             variables = [variables];
@@ -80,22 +88,21 @@
         }
     };
 
+    function getInnerTemplates(domElement) {
+        let templates = Array.prototype.slice.call(domElement.querySelectorAll(Template));
+        let scriptTemplates = Array.prototype.slice.call(domElement.querySelectorAll(ScriptTemplate));
+        return templates.concat(scriptTemplates).filter(t => !!t.id);
+    }
+
+
     jst.load = function load_from_DOM_element (domElement) {
-        if (!domElement)
-            throw new Error("Argument cannot be null");
-        if (typeof domElement.innerHTML === "undefined")
-            throw new Error("Argument is not a DOM element (no innerHTML property)");
-        return new JsTemplate(domElement.innerHTML);
+        return new JsTemplate(getInnerHtmlContent(domElement));
     };
     jst.loadById = function load_from_DOM_element_by_id (id, removeAfterLoad) {
-        if (!id)
-            throw new Error("Id cannot be null");
-        let template = document.getElementById(id);
-        if (!template)
-            throw new Error("DOM does not contain element with id '" + id + "'");
-        let html = template.innerHTML;
+        let domElement = document.getElementById(id);
+        let html = getInnerHtmlContent(domElement);
         if (removeAfterLoad === true)
-            template.parentNode.removeChild(template);
+            domElement.remove();
         return new JsTemplate(html);
     };
     jst.get = function get_template_from_url(url, callback) {
@@ -104,12 +111,10 @@
             if (xmlHttp.readyState === 4 && xmlHttp.status === 200){
                 let element = document.createElement("div");
                 element.innerHTML = xmlHttp.responseText;
-                let templates = element.getElementsByTagName("template");
+                let templates = getInnerTemplates(element);
                 let templCollection = {};
-                for (let i in templates) {
-                    if (!templates.hasOwnProperty(i) || !templates[i].id)
-                        continue;
-                    templCollection[templates[i].id] = new JsTemplate(templates[i].innerHTML);
+                for (let i in templates){
+                    templCollection[templates[i].id] = new JsTemplate(getInnerHtmlContent(templates[i]));
                 }
                 callback(templCollection);
             }
@@ -120,7 +125,6 @@
     jst.create = function create_from_html (html) {
         return new JsTemplate(html);
     };
-
     if (typeof define === 'function' && define.amd) {
         define(function () {
             return jst;
