@@ -1,6 +1,6 @@
 "use strict";
+
 (function (window) {
-    // const Template = "template";
     const ElementSelectorRegex = "template, script[type='text/template']";
     const variableRegex = /{{ *(.+?)( *= *(.+?))? *}}}?/g;
     const selectorRegex = /[\][.]?(\w+)[\].]?/g;
@@ -53,16 +53,13 @@
         return obj;
     }
     function getInnerHtmlContent(domElement) {
-        if (domElement.matches(Template)) {
+        if (domElement.matches(ElementSelectorRegex)) {
             return domElement.innerHTML;
-        }
-        else if (domElement.matches(ElementSelectorRegex)){
-            return domElement.textContent;
         }
         throw new Error("DOM element must be a <template> or a <script type='text/template']>");
     }
     function JsTemplate(html) {
-        if (typeof html === 'HTMLElement')
+        if (html instanceof HTMLElement)
             html = getInnerHtmlContent(html);
         this._maps = createMap(html);
         this._formatters = {};
@@ -92,13 +89,14 @@
     };
 
     function getInnerTemplates(domElement) {
-        return domElement.querySelectorAll(ElementSelectorRegex).filter(t => !!t.id);
+        return Array.prototype.slice.call(domElement.querySelectorAll(ElementSelectorRegex))
+            .filter(t => !!t.id);
     }
-
 
     jst.load = function load_from_DOM_element (domElement) {
         return new JsTemplate(domElement);
     };
+
     jst.loadById = function load_from_DOM_element_by_id (id, removeAfterLoad) {
         let domElement = document.getElementById(id);
         let teml = new JsTemplate(domElement);
@@ -106,6 +104,7 @@
             domElement.remove();
         return teml;    
     };
+
     jst.get = function get_template_from_url(url, callback) {
         let xmlHttp = new XMLHttpRequest();
         xmlHttp.onreadystatechange = () => {
@@ -123,15 +122,19 @@
         xmlHttp.open("GET", url, true);
         xmlHttp.send(null);
     };
+
     jst.create = function create_from_html (html) {
         return new JsTemplate(html);
     };
+
     if (typeof define === 'function' && define.amd) {
         define(() => jst);
     }
+
     else if (typeof module === 'object' && module.exports) {
         module.exports = jst;
     }
+
     else {
         window.JsT = jst;
     }

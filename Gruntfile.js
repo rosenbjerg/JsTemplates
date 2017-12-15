@@ -21,7 +21,7 @@ module.exports = function(grunt) {
                     sourceMap: true,
                     compress: true,
                     mangle: true,
-                    reserved: ['window']
+
                 },
                 files: [{
                     expand: true,
