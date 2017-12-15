@@ -1,7 +1,7 @@
 "use strict";
 (function (window) {
-    const Template = "template";
-    const ScriptTemplate = "script[type='text/template']";
+    // const Template = "template";
+    const ElementSelectorRegex = "template, script[type='text/template']";
     const variableRegex = /{{ *(.+?)( *= *(.+?))? *}}}?/g;
     const selectorRegex = /[\][.]?(\w+)[\].]?/g;
     const htmlEncoderRegex = /[^a-z0-9A-Z ]/g;
@@ -38,6 +38,7 @@
         maps.html.push(html.substring(index, html.index));
         return maps;
     }
+
     function encodeHtml(str) {
         if(!str)
             return "";
@@ -55,12 +56,14 @@
         if (domElement.matches(Template)) {
             return domElement.innerHTML;
         }
-        else if (domElement.matches(ScriptTemplate)){
+        else if (domElement.matches(ElementSelectorRegex)){
             return domElement.textContent;
         }
         throw new Error("DOM element must be a <template> or a <script type='text/template']>");
     }
     function JsTemplate(html) {
+        if (typeof html === 'HTMLElement')
+            html = getInnerHtmlContent(html);
         this._maps = createMap(html);
         this._formatters = {};
     }
@@ -89,21 +92,19 @@
     };
 
     function getInnerTemplates(domElement) {
-        let templates = Array.prototype.slice.call(domElement.querySelectorAll(Template));
-        let scriptTemplates = Array.prototype.slice.call(domElement.querySelectorAll(ScriptTemplate));
-        return templates.concat(scriptTemplates).filter(t => !!t.id);
+        return domElement.querySelectorAll(ElementSelectorRegex).filter(t => !!t.id);
     }
 
 
     jst.load = function load_from_DOM_element (domElement) {
-        return new JsTemplate(getInnerHtmlContent(domElement));
+        return new JsTemplate(domElement);
     };
     jst.loadById = function load_from_DOM_element_by_id (id, removeAfterLoad) {
         let domElement = document.getElementById(id);
-        let html = getInnerHtmlContent(domElement);
+        let teml = new JsTemplate(domElement);
         if (removeAfterLoad === true)
             domElement.remove();
-        return new JsTemplate(html);
+        return teml;    
     };
     jst.get = function get_template_from_url(url, callback) {
         let xmlHttp = new XMLHttpRequest();
@@ -126,12 +127,12 @@
         return new JsTemplate(html);
     };
     if (typeof define === 'function' && define.amd) {
-        define(function () {
-            return jst;
-        })
-    } else if (typeof module === 'object' && module.exports) {
+        define(() => jst);
+    }
+    else if (typeof module === 'object' && module.exports) {
         module.exports = jst;
-    } else {
+    }
+    else {
         window.JsT = jst;
     }
 })(this);
