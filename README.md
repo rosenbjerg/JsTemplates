@@ -2,7 +2,7 @@
 
 Simple templating engine in pure JavaScript
 
-Loading the library creates a global variable named JsT, unless used with module loaders like RequireJs.
+Loading the library creates a global variable named JsT.
 
 ### Syntax
 Variables are wrapped in double curly braces: `{{variable}}`

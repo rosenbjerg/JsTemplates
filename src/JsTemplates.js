@@ -1,6 +1,6 @@
 "use strict";
 
-(function (window) {
+let JsT = (function () {
     const ElementSelectorRegex = "template, script[type='text/template']";
     const variableRegex = /{{ *(.+?)( *= *(.+?))? *}}}?/g;
     const selectorRegex = /[\][.]?(\w+)[\].]?/g;
@@ -56,7 +56,7 @@
         if (domElement.matches(ElementSelectorRegex)) {
             return domElement.innerHTML;
         }
-        throw new Error("DOM element must be a <template> or a <script type='text/template']>");
+        throw new Error("DOM element must be a <template> or a <script type='text/template'>");
     }
     function JsTemplate(html) {
         if (html instanceof HTMLElement)
@@ -126,16 +126,5 @@
     jst.create = function create_from_html (html) {
         return new JsTemplate(html);
     };
-
-    if (typeof define === 'function' && define.amd) {
-        define(() => jst);
-    }
-
-    else if (typeof module === 'object' && module.exports) {
-        module.exports = jst;
-    }
-
-    else {
-        window.JsT = jst;
-    }
-})(this);
+    return jst;
+})();

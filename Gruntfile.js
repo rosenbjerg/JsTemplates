@@ -8,9 +8,9 @@ module.exports = function(grunt) {
             dist: {
                 files: [{
                     "expand": true,
-                    "cwd": "src/js",
+                    "cwd": "src",
                     "src": ["*.js"],
-                    "dest": "build/transpiled",
+                    "dest": "build",
                     "ext": ".js"
                 }]
             }
@@ -25,12 +25,12 @@ module.exports = function(grunt) {
                 },
                 files: [{
                     expand: true,
-                    src: 'build/transpiled/*.js',
-                    dest: '.',
+                    src: 'build/*.js',
+                    dest: "mini",
                     cwd: '.',
                     rename: function (dst, src) {
                         // To keep src js files and make new files as *.min.js :
-                        return dst + '/' + src.replace('.js', '.min.js');
+                        return src.replace('.js', '.min.js');
                     }
                 }]
             }
