@@ -116,6 +116,7 @@ let JsT = (function () {
                 for (let i in templates){
                     templCollection[templates[i].id] = new JsTemplate(getInnerHtmlContent(templates[i]));
                 }
+                element.remove();
                 callback(templCollection);
             }
         };

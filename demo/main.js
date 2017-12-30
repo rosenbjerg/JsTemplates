@@ -10,7 +10,8 @@ document.body.innerHTML += template.render({
         messages: ["Hi", "Welcome", "Goddag"]
     }
 });
-JsT.get("templates.html", function (templates) {
+JsT.get("templates.html", templates =>  {
+    console.log(templates);
     document.body.innerHTML += templates.templ1.render();
     document.body.innerHTML += templates.templ2.render({
         items:  "<li>Test 1</li>" +
